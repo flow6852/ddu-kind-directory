@@ -3,7 +3,10 @@ import {
   Actions,
   BaseKind,
   DduItem,
+  PreviewContext,
+  Previewer,
 } from "https://deno.land/x/ddu_vim@v3.10.1/types.ts";
+import { Denops } from "https://deno.land/x/denops_core@v5.0.0/denops.ts";
 
 type Params = Record<never, never>;
 
@@ -21,7 +24,7 @@ export class Kind extends BaseKind<Params> {
       return ActionFlags.None;
     },
 
-    chain: async (args: { denops: Denops; items: DduItem[] }) => {
+    restart: async (args: { denops: Denops; items: DduItem[] }) => {
       const sources = await Promise.all(args.items.map(async (item) => {
         return await updateSourcePath(item, args.options.sources);
       }));
@@ -63,13 +66,13 @@ export class Kind extends BaseKind<Params> {
 
 const updateSourcePath = async (item: DduItem, sources) => {
   const action = item?.action as ActionData;
-  let retSources = [];
+  const retSources = [];
 
   // NOTE: Deno.stat() may be failed
   try {
     const path = action.path;
     if ((await Deno.stat(path)).isDirectory) {
-      for (let source of sources) {
+      for (const source of sources) {
         retSources.push({ ...source, ...{ options: { path: path } } });
       }
     }
