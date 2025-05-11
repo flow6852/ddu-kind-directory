@@ -35,6 +35,13 @@ export class Kind extends BaseKind<Params> {
       });
       return ActionFlags.None;
     },
+
+    chdir: async (args: { denops: Denops; items: DduItem[] }) => {
+      for (const i of args.items) {
+        await args.denops.call("chdir", i.action.path);
+      }
+      return ActionFlags.None;
+    },
   };
 
   override async getPreviewer(args: {
